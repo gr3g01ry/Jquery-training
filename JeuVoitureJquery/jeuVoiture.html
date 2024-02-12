@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Auto-ecole lesson 1 simulation</title>
+  <style type="text/css">
+    #jeu {
+      width: 400px;
+      height: 400px;
+      border: 5px red double;
+      overflow: hidden;
+      position: relative;
+      margin: auto;
+    }
+
+    .fond {
+      margin-bottom: -5px;
+      z-index: 10;
+      position: relative;
+    }
+
+    #vj {
+      z-index: 100;
+      position: absolute;
+      top: 10px;
+      left: 48px;
+    }
+
+    #vr {
+      z-index: 80;
+      position: absolute;
+      top: -200px;
+      left: 0px;
+    }
+  </style>
+</head>
+
+<body>
+  <h1 style="text-align: center; color:red">Auto ecole simulation - Lesson 1</h1>
+  <h2 style="text-align: center">Collisions : <span id="info">0</span></h2>
+  <div id="jeu">
+    <img id="fond1" class="fond" src="route.png">
+    <img id="fond2" class="fond" src="route.png">
+    <img id="vj" src="vj.png"> <!-- La voiture jaune -->
+    <img id="vr" src="vr.png"> <!-- La voiture rouge -->
+  </div>
+  <audio preload="auto" id="son">
+    <source src="sons/beep.mp3" type="audio/mp3">
+    <source src="sons/beep.ogg" type="audio/ogg">
+  </audio>
+
+  <script src="jquery.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+  <script>
+    let t;
+    $(function () {
+      var ok = 1;
+      function deplace() {
+        $('#vr').animate({ top: '-=550' }, 2000, 'linear', function () {
+          var vrX = Math.floor(Math.random() * 194) + 70;
+          var vrY = 400;
+          $('#vr').css('top', vrY);
+          $('#vr').css('left', vrX);
+          ok = 1;
+        });
+        $('.fond').animate({ top: '-=360' }, 3500, 'linear', function () {
+          $('.fond').css('top', 0);
+          deplace();
+        });
+      };
+
+      function collision() {
+        vjX = parseInt($('#vj').css('left'));
+        vrX = parseInt($('#vr').css('left'));
+        vjY = 10;
+        vrY = parseInt($('#vr').css('top'));
+        if (((vrX > vjX) && (vrX < (vjX + 66)) && (vrY > vjY) && (vrY < (vjY + 150)) && (ok == 1))
+          || ((vjX > vrX) && (vjX < (vrX + 66)) && (vrY > vjY) && (vrY < (vjY + 150)) && (ok == 1))) {
+          $('#son')[0].play();
+          collision = parseInt($('#info').text()) + 1;
+          $('#info').text(collision);
+          ok = 0;
+          if (collision > 5) {
+            console.log(parseInt(collision));
+            alert("fin du cours... Vous n'êtes pas prêt :-|");
+            stopDrive();
+          }
+        }
+      }
+
+      $(document).keydown(function (e) {
+        if (e.which == 39) {
+          vjX = parseInt($('#vj').css('left'));
+          if (vjX < 280)
+            $('#vj').css('left', vjX + 10);
+        }
+        if (e.which == 37) {
+          vjX = parseInt($('#vj').css('left'));
+          if (vjX > 70)
+            $('#vj').css('left', vjX - 10);
+        }
+      });
+
+      $('#son')[0].play();
+      deplace();
+
+      function driveListener() {
+        t=setInterval(collision, 20);
+      }
+      function stopDrive(){
+        clearInterval(t);
+      }
+      driveListener();
+    });
+
+  </script>
+</body>
+
+</html>
